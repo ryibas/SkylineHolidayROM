@@ -123,7 +123,8 @@ sprites:
   .db $30, $05, $00, $40   ;sprite 7 - L
   .db $30, $06, $00, $48   ;sprite 8 - I
   .db $30, $10, $00, $50   ;sprite 8 - N   
-  .db $30, $0D, $00, $58   ;sprite 8 - E  
+  .db $30, $0D, $00, $58   ;sprite 8 - E
+  .db $40, $12, $00, $58   ;sprite 8 - E      
 
   .org $FFFA     ;first of the three vectors starts here
   .dw NMI        ;when an NMI happens (once per frame if enabled) the 
