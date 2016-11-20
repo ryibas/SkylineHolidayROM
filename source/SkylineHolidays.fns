@@ -1,0 +1,13 @@
+; SkylineHolidays.asm
+LoadSpritesLoop                  = $C059
+LoadPalettes                     = $C03D
+Forever                          = $C06E
+palette                          = $E000
+LoadPalettesLoop                 = $C04C
+LoadSprites                      = $C057
+vblankwait1                      = $C014
+vblankwait2                      = $C038
+clrmem                           = $C019
+RESET                            = $C000
+sprites                          = $E020
+NMI                              = $C071
