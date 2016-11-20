@@ -89,6 +89,24 @@ NMI:
   LDA #$02
   STA $4014  ; set the high byte (02) of the RAM address, start the transfer
   
+LatchController:
+  LDA #$01
+  STA $4016
+  LDA #$00
+  STA $4016       ; tell both the controllers to latch buttons
+
+
+ReadA: 
+  LDA $4016       ; player 1 - A
+  AND #%00000001  ; only look at bit 0
+  BEQ ReadADone   ; branch to ReadADone if button is NOT pressed (0)
+                  ; add instructions here to do something when button IS pressed (1)
+  LDA $0203       ; load sprite X position
+  CLC             ; make sure the carry flag is clear
+  ADC #$01        ; A = A + 1
+  STA $0203       ; save sprite X position
+ReadADone:        ; handling this button is done
+
   RTI        ; return from interrupt
  
 ;;;;;;;;;;;;;;  
@@ -103,28 +121,28 @@ palette:
 
 sprites:
      ;vert tile attr horiz
-  .db $10, $00, $00, $10   ;sprite 0 - H
-  .db $10, $01, $00, $18   ;sprite 1 - A
-  .db $10, $02, $00, $20   ;sprite 2 - P
-  .db $10, $02, $00, $28   ;sprite 3 - P
-  .db $10, $03, $00, $30   ;sprite 4 - Y
-  .db $20, $00, $00, $10   ;sprite 5 - H 
-  .db $20, $04, $00, $18   ;sprite 6 - O
-  .db $20, $05, $00, $20   ;sprite 7 - L
-  .db $20, $06, $00, $28   ;sprite 8 - I
-  .db $20, $07, $00, $30   ;sprite 9 - D
-  .db $20, $01, $00, $38   ;sprite 10 - A
-  .db $20, $03, $00, $40   ;sprite 11 - Y
-  .db $20, $08, $00, $48   ;sprite 12 - S
-  .db $30, $11, $00, $10   ;sprite 13 - -
-  .db $30, $08, $00, $28   ;sprite 12 - S
-  .db $30, $0E, $00, $30   ;sprite 12 - K
-  .db $30, $03, $00, $38   ;sprite 4 - Y
-  .db $30, $05, $00, $40   ;sprite 7 - L
-  .db $30, $06, $00, $48   ;sprite 8 - I
-  .db $30, $10, $00, $50   ;sprite 8 - N   
-  .db $30, $0D, $00, $58   ;sprite 8 - E
-  .db $40, $12, $00, $58   ;sprite 8 - E      
+  .db $40, $12, $00, $58   ;sprite - WEE LIL MONSTER     
+  .db $10, $00, $00, $10   ;sprite - H
+  .db $10, $01, $00, $18   ;sprite - A
+  .db $10, $02, $00, $20   ;sprite - P
+  .db $10, $02, $00, $28   ;sprite - P
+  .db $10, $03, $00, $30   ;sprite - Y
+  .db $20, $00, $00, $10   ;sprite - H 
+  .db $20, $04, $00, $18   ;sprite - O
+  .db $20, $05, $00, $20   ;sprite - L
+  .db $20, $06, $00, $28   ;sprite - I
+  .db $20, $07, $00, $30   ;sprite - D
+  .db $20, $01, $00, $38   ;sprite - A
+  .db $20, $03, $00, $40   ;sprite - Y
+  .db $20, $08, $00, $48   ;sprite - S
+  .db $30, $11, $00, $10   ;sprite - -
+  .db $30, $08, $00, $28   ;sprite - S
+  .db $30, $0E, $00, $30   ;sprite - K
+  .db $30, $03, $00, $38   ;sprite - Y
+  .db $30, $05, $00, $40   ;sprite - L
+  .db $30, $06, $00, $48   ;sprite - I
+  .db $30, $10, $00, $50   ;sprite - N   
+  .db $30, $0D, $00, $58   ;sprite - E
 
   .org $FFFA     ;first of the three vectors starts here
   .dw NMI        ;when an NMI happens (once per frame if enabled) the 
