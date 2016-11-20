@@ -66,7 +66,7 @@ LoadSpritesLoop:
   LDA sprites, x        ; load data from address (sprites +  x)
   STA $0200, x          ; store into RAM address ($0200 + x)
   INX                   ; X = X + 1
-  CPX #$60              ; Compare X to hex $20, decimal 32
+  CPX #$80              ; Compare X to hex $20, decimal 32
   BNE LoadSpritesLoop   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
                         ; if compare was equal to 32, keep going down
               
@@ -112,7 +112,18 @@ sprites:
   .db $20, $04, $00, $18   ;sprite 6 - O
   .db $20, $05, $00, $20   ;sprite 7 - L
   .db $20, $06, $00, $28   ;sprite 8 - I
-  .db $20, $01, $00, $30   ;sprite 9 - D
+  .db $20, $07, $00, $30   ;sprite 9 - D
+  .db $20, $01, $00, $38   ;sprite 10 - A
+  .db $20, $03, $00, $40   ;sprite 11 - Y
+  .db $20, $08, $00, $48   ;sprite 12 - S
+  .db $40, $09, $00, $10   ;sprite 13 - F
+  .db $40, $0A, $00, $18   ;sprite 14 - R
+  .db $40, $04, $00, $20   ;sprite 15 - O
+  .db $40, $0B, $00, $28   ;sprite 15 - M
+  .db $40, $03, $00, $38   ;sprite 11 - Y
+  .db $40, $04, $00, $40   ;sprite 15 - O
+  .db $40, $0C, $00, $48   ;sprite 15 - M
+  .db $40, $0A, $00, $50   ;sprite 14 - R
 
   .org $FFFA     ;first of the three vectors starts here
   .dw NMI        ;when an NMI happens (once per frame if enabled) the 
