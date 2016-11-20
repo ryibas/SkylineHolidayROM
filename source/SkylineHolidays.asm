@@ -81,7 +81,7 @@ LoadSpritesLoop:
 Forever:
   JMP Forever     ;jump back to Forever, infinite loop
   
- 
+
 
 NMI:
   LDA #$00
@@ -129,10 +129,10 @@ ReadUp:
   AND #%00000001  ; only look at bit 0
   BEQ ReadUpDone   ; branch to ReadBDone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
-  LDA $0203       ; load sprite X position
-  CLC             ; make sure the carry flag is clear
-  ADC #$01        ; A = A + 1
-  STA $0203       ; save sprite X position
+  LDA $0200       ; load sprite X position
+  SEC             ; make sure the carry flag is clear
+  SBC #$01        ; A = A - 1
+  STA $0200       ; save sprite X position
 ReadUpDone:        ; handling this button is done
 
 ReadDown: 
@@ -140,10 +140,10 @@ ReadDown:
   AND #%00000001  ; only look at bit 0
   BEQ ReadDownDone   ; branch to ReadBDone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
-  LDA $0203       ; load sprite X position
+  LDA $0200       ; load sprite X position
   CLC             ; make sure the carry flag is clear
   ADC #$01        ; A = A + 1
-  STA $0203       ; save sprite X position
+  STA $0200       ; save sprite X position
 ReadDownDone:        ; handling this button is done
 
 ReadLeft: 
@@ -152,8 +152,8 @@ ReadLeft:
   BEQ ReadLeftDone   ; branch to ReadBDone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
   LDA $0203       ; load sprite X position
-  CLC             ; make sure the carry flag is clear
-  ADC #$01        ; A = A + 1
+  SEC             ; make sure the carry flag is clear
+  SBC #$01        ; A = A - 1
   STA $0203       ; save sprite X position
 ReadLeftDone:        ; handling this button is done
 
