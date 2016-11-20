@@ -116,14 +116,14 @@ sprites:
   .db $20, $01, $00, $38   ;sprite 10 - A
   .db $20, $03, $00, $40   ;sprite 11 - Y
   .db $20, $08, $00, $48   ;sprite 12 - S
-  .db $40, $09, $00, $10   ;sprite 13 - F
-  .db $40, $0A, $00, $18   ;sprite 14 - R
-  .db $40, $04, $00, $20   ;sprite 15 - O
-  .db $40, $0B, $00, $28   ;sprite 15 - M
-  .db $40, $03, $00, $38   ;sprite 11 - Y
-  .db $40, $04, $00, $40   ;sprite 15 - O
-  .db $40, $0C, $00, $48   ;sprite 15 - M
-  .db $40, $0A, $00, $50   ;sprite 14 - R
+  .db $30, $11, $00, $10   ;sprite 13 - -
+  .db $30, $08, $00, $28   ;sprite 12 - S
+  .db $30, $0E, $00, $30   ;sprite 12 - K
+  .db $30, $03, $00, $38   ;sprite 4 - Y
+  .db $30, $05, $00, $40   ;sprite 7 - L
+  .db $30, $06, $00, $48   ;sprite 8 - I
+  .db $30, $10, $00, $50   ;sprite 8 - N   
+  .db $30, $0D, $00, $58   ;sprite 8 - E  
 
   .org $FFFA     ;first of the three vectors starts here
   .dw NMI        ;when an NMI happens (once per frame if enabled) the 
