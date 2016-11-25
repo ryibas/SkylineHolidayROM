@@ -42,10 +42,7 @@ clrmem:
 vblankwait2:      ; Second wait for vblank, PPU is ready after this
   BIT $2002
   BPL vblankwait2
-
-
-
-; ************** NEW CODE ****************
+ 
 LoadPalettes:
   LDA $2002    ; read PPU status to reset the high/low latch
   LDA #$3F
@@ -53,6 +50,7 @@ LoadPalettes:
   LDA #$00
   STA $2006    ; write the low byte of $3F00 address
   LDX #$00
+
 LoadPalettesLoop:
   LDA palette, x        ;load palette byte
   STA $2007             ;write to PPU
@@ -62,6 +60,7 @@ LoadPalettesLoop:
 
 LoadSprites:
   LDX #$00              ; start at 0
+
 LoadSpritesLoop:
   LDA sprites, x        ; load data from address (sprites +  x)
   STA $0200, x          ; store into RAM address ($0200 + x)
@@ -81,8 +80,6 @@ LoadSpritesLoop:
 Forever:
   JMP Forever     ;jump back to Forever, infinite loop
   
-
-
 NMI:
   LDA #$00
   STA $2003  ; set the low byte (00) of the RAM address
@@ -94,7 +91,6 @@ LatchController:
   STA $4016
   LDA #$00
   STA $4016       ; tell both the controllers to latch buttons
-
 
 ReadA: 
   LDA $4016       ; player 1 - A
@@ -172,8 +168,6 @@ ReadRightDone:        ; handling this button is done
  
 ;;;;;;;;;;;;;;  
   
-  
-  
   .bank 1
   .org $E000
 palette:
@@ -212,9 +206,7 @@ sprites:
                    ;to the label RESET:
   .dw 0          ;external interrupt IRQ is not used in this tutorial
   
-  
 ;;;;;;;;;;;;;;  
-  
   
   .bank 2
   .org $0000
