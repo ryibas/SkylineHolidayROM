@@ -2,13 +2,17 @@
   .ineschr 1   ; 1x  8KB CHR data
   .inesmap 0   ; mapper 0 = NROM, no bank swapping
   .inesmir 1   ; background mirroring
-  
 
-;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; NES Header lines above - these are required
 
-    
   .bank 0
   .org $C000 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; RESET happens on NES reboot.
 RESET:
   SEI          ; disable IRQs
   CLD          ; disable decimal mode
@@ -21,10 +25,17 @@ RESET:
   STX $2001    ; disable rendering
   STX $4010    ; disable DMC IRQs
 
-vblankwait1:       ; First wait for vblank to make sure PPU is ready
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; First wait for vblank to make sure the PPU is ready. PPU is the graphics
+;; chip on the NES.
+vblankwait1:
   BIT $2002
   BPL vblankwait1
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Clear memory routine.
 clrmem:
   LDA #$00
   STA $0000, x
@@ -39,10 +50,16 @@ clrmem:
   INX
   BNE clrmem
    
-vblankwait2:      ; Second wait for vblank, PPU is ready after this
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Second wait for vblank, PPU (graphics) chip is ready after this.
+vblankwait2:
   BIT $2002
   BPL vblankwait2
- 
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Loads in the color palettes.
 LoadPalettes:
   LDA $2002    ; read PPU status to reset the high/low latch
   LDA #$3F
@@ -51,6 +68,9 @@ LoadPalettes:
   STA $2006    ; write the low byte of $3F00 address
   LDX #$00
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Loops through the palette and loads it.
 LoadPalettesLoop:
   LDA palette, x        ;load palette byte
   STA $2007             ;write to PPU
@@ -58,19 +78,23 @@ LoadPalettesLoop:
   CPX #$20            
   BNE LoadPalettesLoop  ;if x = $20, 32 bytes copied, all done
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Loads in the sprites.
 LoadSprites:
   LDX #$00              ; start at 0
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Loops through the sprites available below and loads them.
 LoadSpritesLoop:
   LDA sprites, x        ; load data from address (sprites +  x)
   STA $0200, x          ; store into RAM address ($0200 + x)
   INX                   ; X = X + 1
-  CPX #$80              ; Compare X to hex $20, decimal 32
+  CPX #$80              ; Compare X to hex $80, decimal 128
   BNE LoadSpritesLoop   ; Branch to LoadSpritesLoop if compare was Not Equal to zero
-                        ; if compare was equal to 32, keep going down
+                        ; if compare was equal to 128, keep going down
               
-              
-
   LDA #%10000000   ; enable NMI, sprites from Pattern Table 1
   STA $2000
 
@@ -79,19 +103,28 @@ LoadSpritesLoop:
 
 Forever:
   JMP Forever     ;jump back to Forever, infinite loop
-  
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;  NMI Routine
 NMI:
   LDA #$00
   STA $2003  ; set the low byte (00) of the RAM address
   LDA #$02
   STA $4014  ; set the high byte (02) of the RAM address, start the transfer
   
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; LatchController Routine
 LatchController:
   LDA #$01
   STA $4016
   LDA #$00
   STA $4016       ; tell both the controllers to latch buttons
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Read A button routine 
 ReadA: 
   LDA $4016       ; player 1 - A
   AND #%00000001  ; only look at bit 0
@@ -99,6 +132,9 @@ ReadA:
                   ; add instructions here to do something when button IS pressed (1)
 ReadADone:        ; handling this button is done
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Read B button routine
 ReadB: 
   LDA $4016       ; player 1 - B
   AND #%00000001  ; only look at bit 0
@@ -106,46 +142,61 @@ ReadB:
                   ; add instructions here to do something when button IS pressed (1)
 ReadBDone:        ; handling this button is done
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Read Select button routine
 ReadSelect: 
-  LDA $4016       ; player 1 - B
+  LDA $4016       ; player 1 - Select button
   AND #%00000001  ; only look at bit 0
-  BEQ ReadSelectDone   ; branch to ReadBDone if button is NOT pressed (0)
+  BEQ ReadSelectDone   ; branch to ReadSelectDone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
 ReadSelectDone:        ; handling this button is done
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Read Start button routine
 ReadStart: 
-  LDA $4016       ; player 1 - B
+  LDA $4016       ; player 1 - Start button
   AND #%00000001  ; only look at bit 0
-  BEQ ReadStartDone   ; branch to ReadBDone if button is NOT pressed (0)
+  BEQ ReadStartDone   ; branch to ReadStartDone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
 ReadStartDone:        ; handling this button is done
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Read Up button routine
 ReadUp: 
-  LDA $4016       ; player 1 - B
+  LDA $4016       ; player 1 - Up button
   AND #%00000001  ; only look at bit 0
-  BEQ ReadUpDone   ; branch to ReadBDone if button is NOT pressed (0)
+  BEQ ReadUpDone   ; branch to ReadUpDone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
-  LDA $0200       ; load sprite X position
+  LDA $0200       ; load sprite Y position
   SEC             ; make sure the carry flag is clear
   SBC #$01        ; A = A - 1
-  STA $0200       ; save sprite X position
+  STA $0200       ; save sprite Y position
 ReadUpDone:        ; handling this button is done
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Read Down button routine
 ReadDown: 
-  LDA $4016       ; player 1 - B
+  LDA $4016       ; player 1 - Down button
   AND #%00000001  ; only look at bit 0
-  BEQ ReadDownDone   ; branch to ReadBDone if button is NOT pressed (0)
+  BEQ ReadDownDone   ; branch to ReadDownDone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
-  LDA $0200       ; load sprite X position
+  LDA $0200       ; load sprite Y position
   CLC             ; make sure the carry flag is clear
   ADC #$01        ; A = A + 1
-  STA $0200       ; save sprite X position
+  STA $0200       ; save sprite Y position
 ReadDownDone:        ; handling this button is done
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Read Left button routine
 ReadLeft: 
-  LDA $4016       ; player 1 - B
+  LDA $4016       ; player 1 - Left button
   AND #%00000001  ; only look at bit 0
-  BEQ ReadLeftDone   ; branch to ReadBDone if button is NOT pressed (0)
+  BEQ ReadLeftDone   ; branch to ReadLeftDone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
   LDA $0203       ; load sprite X position
   SEC             ; make sure the carry flag is clear
@@ -153,10 +204,13 @@ ReadLeft:
   STA $0203       ; save sprite X position
 ReadLeftDone:        ; handling this button is done
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Read Right button routine
 ReadRight: 
-  LDA $4016       ; player 1 - B
+  LDA $4016       ; player 1 - Right button
   AND #%00000001  ; only look at bit 0
-  BEQ ReadRightDone   ; branch to ReadBDone if button is NOT pressed (0)
+  BEQ ReadRightDone   ; branch to ReadRightDone if button is NOT pressed (0)
                   ; add instructions here to do something when button IS pressed (1)
   LDA $0203       ; load sprite X position
   CLC             ; make sure the carry flag is clear
@@ -166,14 +220,37 @@ ReadRightDone:        ; handling this button is done
 
   RTI        ; return from interrupt
  
-;;;;;;;;;;;;;;  
-  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;  
   .bank 1
   .org $E000
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Color palette - this gets loaded up above.
 palette:
   .db $0F,$31,$32,$33,$0F,$35,$36,$37,$0F,$39,$3A,$3B,$0F,$3D,$3E,$0F
   .db $0F,$1C,$15,$14,$0F,$02,$38,$3C,$0F,$1C,$15,$14,$0F,$02,$38,$3C
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; Sprites available - these get loaded up above. These rows point to 
+;; positions in the holidays.chr file loaded in at the bottom of this
+;; file. There are four values in each row. 
+;; 
+;; 1.) Vertical position on the screen to display sprite.
+;; 2.) Tile number to pull from the .chr file. 
+;; 3.) Attributes
+;; 4.) Horizontal position on the screen to display sprite.
+;;
+;; In this demo, we use the first sprite (tile $12) which is the little
+;; alien that gets moved around on the screen with the ReadUp, ReadDown,
+;; ReadLeft, and ReadRight routines above. The routines above then modify
+;; the position (vertical and horizontal) values of the sprite to 
+;; simulate movement.
 sprites:
      ;vert tile attr horiz
   .db $40, $12, $00, $58   ;sprite - WEE LIL MONSTER     
@@ -206,8 +283,9 @@ sprites:
                    ;to the label RESET:
   .dw 0          ;external interrupt IRQ is not used in this tutorial
   
-;;;;;;;;;;;;;;  
-  
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
   .bank 2
   .org $0000
-  .incbin "holidays.chr"   ;includes 8KB graphics file from SMB1
+  .incbin "holidays.chr"   ; Sprite file that contains the images and lettering for the demo
