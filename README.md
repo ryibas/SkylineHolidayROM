@@ -6,23 +6,19 @@ You can still use a Mac to do most of the development, it’s just that some of 
 
 **Ingredients Needed**
 
-- **PC** - Really any Windows machine will work for this.
-- **Visual Studio Code** - A great lightweight editor that works surprisingly well for editing assembly code.
-- 
-    - [https://code.visualstudio.com/](https://code.visualstudio.com/)
+**PC** - Really any Windows machine will work for this.
+**Visual Studio Code** - A great lightweight editor that works surprisingly well for editing assembly code.
+        [https://code.visualstudio.com/](https://code.visualstudio.com/)
 
-- **Emulator (Fceux)** - This is the application you will use to actually run your NES game.
-- 
-    - [http://www.fceux.com/web/home.html](http://www.fceux.com/web/home.html)
+**Emulator (Fceux)** - This is the application you will use to actually run your NES game.
+        [http://www.fceux.com/web/home.html](http://www.fceux.com/web/home.html)
 
-- **NESASM3** - This is the application that takes your source code (.asm file) and compiles it into a .nes file which can then be opened by the Fceux emulator. 
-- 
-    - NESASM3 Source Code - [https://github.com/toastynerd/nesasm](https://github.com/toastynerd/nesasm)
-    - NESASM3 Application - [http://www.nespowerpak.com/nesasm/NESASM3.zip](http://www.nespowerpak.com/nesasm/NESASM3.zip)
+**NESASM3** - This is the application that takes your source code (.asm file) and compiles it into a .nes file which can then be opened by the Fceux emulator. 
+    NESASM3 Source Code [https://github.com/toastynerd/nesasm](https://github.com/toastynerd/nesasm)
+    NESASM3 Application [http://www.nespowerpak.com/nesasm/NESASM3.zip](http://www.nespowerpak.com/nesasm/NESASM3.zip)
 
-- **YY CHR** - The application that can be used to create sprite images. This was used to create the letters and the little monster in the game.
-- 
-    - [http://www.romhacking.net/utilities/119/](http://www.romhacking.net/utilities/119/)
+**YY CHR** - The application that can be used to create sprite images. This was used to create the letters and the little monster in the game.
+    [http://www.romhacking.net/utilities/119/](http://www.romhacking.net/utilities/119/)
 
 Keep in mind that these tools are slowly fading from the Internet and you may have to search around for links to download them or even replacements (if they exist). Also, always be prudent when downloading things from the Internet. We don't need any viruses for the holidays.
 
